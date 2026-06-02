@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎓 知识星球</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a1a;--card:#14142b;--surface:#1a1a35;--accent:#6c5ce7;--gold:#ffd700;--green:#00d4aa;--pink:#ff6b9d;--blue:#4ecdc4;--cyan:#0abde3;--orange:#ff9f43;--text:#e0e0ff;--sub:#8888aa}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 50%,var(--accent)33 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,var(--pink)22 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,var(--blue)22 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* Header */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,26,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.logo small{font-size:11px;-webkit-text-fill-color:var(--sub);font-weight:400}
+.hd{display:flex;gap:16px;align-items:center;font-size:13px}
+.hd div{text-align:center}
+.hd .v{font-weight:700;color:var(--gold);font-size:16px}
+.hd .l{color:var(--sub);font-size:10px}
+
+/* Main */
+main{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:12px 16px 100px}
+
+/* Cards */
+.c{background:var(--card);border-radius:16px;padding:20px;margin-bottom:14px;border:1px solid rgba(255,255,255,.04)}
+.c-title{font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* Hero */
+.hero{text-align:center;padding:24px 0 16px}
+.hero h1{font-size:28px;font-weight:800;margin-bottom:4px}
+.hero h1 span{background:linear-gradient(135deg,var(--gold),var(--pink),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--sub);font-size:14px;margin-bottom:8px}
+.xb{background:var(--card);border-radius:20px;height:10px;margin:6px auto;max-width:360px;overflow:hidden}
+.xf{background:linear-gradient(90deg,var(--accent),var(--pink));height:100%;border-radius:20px;transition:width .5s}
+.xt{font-size:11px;color:var(--sub)}
+.xp-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:800;pointer-events:none;z-index:999;animation:xpAnim .8s forwards}
+@keyframes xpAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+.level-up{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:999;animation:fadeIn .3s}
+.level-up-inner{text-align:center;background:var(--card);border-radius:24px;padding:40px;border:2px solid var(--gold)}
+.level-up-inner h2{font-size:36px;color:var(--gold);margin:8px 0}
+.level-up-inner p{color:var(--sub);font-size:14px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:var(--card);color:var(--sub);cursor:pointer;white-space:nowrap;transition:all .3s;font-size:13px;flex-shrink:0}
+.tab.active,.tab:hover{border-color:var(--accent);color:#fff;background:var(--accent)33}
+
+/* Subjects grid */
+.gg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g-card{background:var(--card);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .3s;border:1px solid transparent}
+.g-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 6px 20px rgba(108,92,231,.15)}
+.g-card .i{font-size:28px;margin-bottom:4px}
+.g-card .n{font-size:14px;font-weight:600;margin-bottom:2px}
+.g-card .c{font-size:11px;color:var(--sub)}
+
+/* Tasks */
+.tt{background:var(--card);border-radius:14px;padding:14px;margin:6px 0;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+.tt:active{transform:scale(.97)}
+.tt .cb{width:22px;height:22px;border-radius:50%;border:2px solid var(--sub);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.tt.done .cb{border-color:var(--green);background:var(--green)}
+.tt.done .cb::after{content:'✓';color:#fff;font-weight:700;font-size:14px}
+.tt .tn{font-size:14px;flex:1}
+.tt .tx{font-size:12px;color:var(--gold);font-weight:600}
+.tt.done .tn{opacity:.4;text-decoration:line-through}
+.tt.done .tx{display:none}
+.task-progress{font-size:12px;color:var(--sub);text-align:center;margin:8px 0}
+
+/* Flashcards */
+.fc{perspective:1000px;height:260px;margin:12px 0;cursor:pointer}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.fc.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:18px;padding:24px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.fc-f{background:var(--card);border:2px solid var(--accent)44}
+.fc-b{background:var(--card);border:2px solid var(--green)44;transform:rotateY(180deg)}
+.fc-f .ql{font-size:11px;color:var(--accent);margin-bottom:8px}
+.fc-f .qt{font-size:18px;font-weight:600;line-height:1.6}
+.fc-b .qa{font-size:15px;line-height:1.8;text-align:left;max-height:200px;overflow-y:auto;width:100%}
+.fc-h{text-align:center;color:var(--sub);font-size:12px;margin:6px 0}
+
+/* Quiz */
+.qz{background:var(--card);border-radius:18px;padding:20px;margin:12px 0}
+.qz-q{font-size:17px;font-weight:600;margin-bottom:14px;line-height:1.6}
+.qz-o{display:block;width:100%;padding:12px 16px;margin:6px 0;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:var(--bg);color:var(--text);text-align:left;font-size:14px;cursor:pointer;transition:all .2s}
+.qz-o:hover{border-color:var(--accent);background:var(--accent)22}
+.qz-o.cr{border-color:var(--green);background:var(--green)22;color:var(--green)}
+.qz-o.wr{border-color:var(--pink);background:var(--pink)22;color:var(--pink)}
+.qz-r{text-align:center;padding:12px 0;font-weight:600}
+.qz-xp{font-size:20px;color:var(--gold);margin-top:4px}
+
+/* Stats */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.s-card{background:var(--card);border-radius:14px;padding:16px;text-align:center}
+.s-card .v{font-size:28px;font-weight:800;color:var(--gold)}
+.s-card .l{font-size:12px;color:var(--sub);margin-top:2px}
+.brow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600}
+.badge-e{background:var(--gold)22;color:var(--gold);border:1px solid var(--gold)44}
+.badge-l{background:var(--card);color:var(--sub);border:1px solid rgba(255,255,255,.08);opacity:.4}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:10px 24px;border-radius:20px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:active{transform:scale(.96)}
+.btn-p{background:var(--accent);color:#fff}
+.btn-s{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.1)}
+.btn-g{background:linear-gradient(135deg,var(--gold),#ffaa00);color:#1a1a2e}
+.btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+
+/* Report */
+.rg{background:var(--card);border-radius:14px;padding:14px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
+.rg .rn{font-size:14px;font-weight:600}
+.rg .rv{font-size:14px;color:var(--gold)}
+
+
+/* Responsive */
+@media(max-width:480px){
+.hero h1{font-size:22px}
+.gg{grid-template-columns:repeat(2,1fr)}
+.sg{grid-template-columns:repeat(2,1fr)}
+.fc{height:220px}
+.fc-f .qt{font-size:16px}
+.hd{gap:10px}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">🎓 知识星球 <small>高中学习</small></div>
+<div class="hd">
+<div><div class="v" id="xp">0</div><div class="l">XP</div></div>
+<div><div class="v" id="streak">🔥0</div><div class="l">天</div></div>
+<div><div class="v" id="level">Lv1</div><div class="l">等级</div></div>
+</div>
+</header>
+
+<main>
+<div class="hero">
+<h1><span id="greeting">今天变强了吗？</span></h1>
+<p id="hero-desc" style="font-size:13px">每天学一点，你就是下一个学霸</p>
+<div class="xb"><div class="xf" id="xp-fill" style="width:0%"></div></div>
+<div class="xt" id="xp-detail">0 / 100 XP</div>
+</div>
+
+<div class="tabs" id="tabs">
+<div class="tab active">🏠 首页</div>
+<div class="tab">📚 学科</div>
+<div class="tab">🃏 速记卡</div>
+<div class="tab">🎯 答题</div>
+<div class="tab">📊 报告</div>
+</div>
+
+<!-- 首页 -->
+<div id="v-home">
+<div class="c"><div class="c-title">📋 今日任务</div>
+<div id="tasks"></div>
+<div class="task-progress" id="task-prog"></div></div>
+<div class="c"><div class="c-title">🔥 学习轨迹</div>
+<div id="recent-activity">还没有学习记录，快去翻卡吧！</div></div>
+</div>
+
+<!-- 学科 -->
+<div id="v-subjects" style="display:none"><div class="c"><div class="c-title">选择学科</div><div class="gg" id="subj-grid"></div></div>
+<div class="c"><div class="c-title">📊 各科进度</div><div id="subj-progress"></div></div></div>
+
+<!-- 速记卡 -->
+<div id="v-flashcards" style="display:none">
+<div class="c-title" style="padding:0 0 8px"><span id="fc-subject-name">数学</span> · <span id="fc-progress">0/0</span></div>
+<div class="fc" onclick="flipCard()"><div class="fc-inner"><div class="fc-f"><div class="ql">💡 点击翻转</div><div class="qt" id="fc-q"></div></div><div class="fc-b"><div class="qa" id="fc-a"></div></div></div></div>
+<div class="fc-h" id="fc-hint">👆 点击卡片翻转</div>
+<div class="btn-row"><button class="btn btn-s" onclick="prevCard()">⬅</button>
+<button class="btn btn-p" onclick="nextCard()">下一张 ➡</button></div>
+</div>
+
+<!-- 答题 -->
+<div id="v-quiz" style="display:none">
+<div class="qz"><div class="qz-q" id="qz-q"></div><div id="qz-o"></div><div class="qz-r" id="qz-r"></div>
+<div class="btn-row" id="qz-action" style="display:none"><button class="btn btn-p" onclick="nextQuiz()">下一题 ➡</button></div></div>
+</div>
+
+<!-- 报告 -->
+<div id="v-report" style="display:none">
+<div class="sg"><div class="s-card"><div class="l">总经验</div><div class="v" id="r-xp">0</div></div>
+<div class="s-card"><div class="l">连续打卡</div><div class="v" id="r-streak">0</div></div>
+<div class="s-card"><div class="l">正确率</div><div class="v" id="r-acc">0%</div></div>
+<div class="s-card"><div class="l">已学卡片</div><div class="v" id="r-cards">0</div></div></div>
+<div class="c"><div class="c-title">🏅 徽章</div><div class="brow" id="badges"></div></div>
+<div class="c"><div class="c-title">📈 各科正确率</div><div id="r-subj"></div></div>
+</div>
+</main>
+
+<script>
+// ===== DATA =====
+const SUBJECTS = ['math','physics','chem','english','chinese','history'];
+const SUBJ_NAMES = {math:'数学',physics:'物理',chem:'化学',english:'英语',chinese:'语文',history:'历史'};
+const SUBJ_ICONS = {math:'📐',physics:'⚡',chem:'🧪',english:'📖',chinese:'🖋️',history:'🏛️'};
+const SUBJ_COLORS = {math:'#6c5ce7',physics:'#4ecdc4',chem:'#ff6b9d',english:'#ffd700',chinese:'#a29bfe',history:'#fd79a8'};
+
+const FC = {
+math:[{q:'二次函数 y=ax²+bx+c 顶点坐标？',a:'(-b/2a, 4ac-b²/4a)<br>对称轴 x=-b/2a'},
+{q:'正弦定理公式？',a:'a/sinA = b/sinB = c/sinC = 2R （R为外接圆半径）'},
+{q:'等差数列求和？',a:'Sn = n(a1+an)/2 = na1 + n(n-1)d/2'},
+{q:'圆锥体积公式？',a:'V = πr²h/3 · 记住「柱三锥一」'},
+{q:'什么是充要条件？',a:'A⇒B 充分, B⇒A 必要, 同时成立→充要'},
+{q:'余弦定理公式？',a:'a² = b² + c² - 2bc·cosA'},
+{q:'排列数公式？',a:'A(n,m) = n!/(n-m)!'},
+{q:'组合数公式？',a:'C(n,m) = n!/[m!(n-m)!]'},
+{q:'对数公式 log₂8=？',a:'log₂8 = 3, 因为 2³=8'},
+{q:'导数公式 (xⁿ)′ = ?',a:'(xⁿ)′ = nxⁿ⁻¹'},
+{q:'向量点积公式？',a:'a·b = |a||b|cosθ = x₁x₂ + y₁y₂'},
+{q:'三角函数 tan = ?',a:'tanα = sinα / cosα'},
+{q:'圆的面积公式？',a:'S = πr² · 扇形面积 S=½lr'},
+{q:'什么是函数定义域？',a:'函数自变量 x 的取值范围'},
+{q:'抛物线焦点坐标？',a:'y²=2px 焦点 (p/2,0)'},
+{q:'极限 lim(x→0) sinx/x = ?',a:'= 1 · 重要极限'},
+{q:'复数 i² = ?',a:'i² = -1'},
+{q:'标准差公式？',a:'σ = √[σ²] = √(Σ(x-μ)²/n)'},
+],
+physics:[{q:'F=ma 单位？',a:'F(N), m(kg), a(m/s²)'},
+{q:'动能定理？',a:'W = ΔEk = ½mv₂² - ½mv₁²'},
+{q:'欧姆定律？',a:'I = U/R · U = IR · R = U/I'},
+{q:'自由落体公式？',a:'v = gt · h = ½gt² · g≈10m/s²'},
+{q:'功率公式？',a:'P = W/t = Fv'},
+{q:'光的折射定律？',a:'n₁sinθ₁ = n₂sinθ₂ (斯涅尔定律)'},
+{q:'动量守恒？',a:'m₁v₁ + m₂v₂ = m₁v₁\' + m₂v₂\''},
+{q:'什么是电场强度？',a:'E = F/q · 电场某点单位正电荷受力'},
+{q:'安培定律？',a:'F = BIL · 通电导线在磁场中受力'},
+{q:'热力学第一定律？',a:'ΔU = Q + W · 内能变化=吸热+做功'},
+{q:'声音的速度？',a:'空气中约 340m/s (15°C)'},
+{q:'什么是完全弹性碰撞？',a:'动能守恒的碰撞'},
+{q:'角速度 ω 和线速度 v？',a:'v = ωr · ω 单位 rad/s'},
+{q:'液体的压强？',a:'p = ρgh · 液体内部压强'},
+{q:'什么是电磁感应？',a:'变化的磁场产生电动势'},
+],
+chem:[{q:'前20号元素周期表？',a:'氢氦锂铍硼 碳氮氧氟氖 | 钠镁铝硅磷 硫氯氩钾钙'},
+{q:'氧化还原口诀？',a:'升失氧·降得还（升价失电子被氧化）'},
+{q:'pH与酸碱性？',a:'pH<7 酸, =7 中, >7 碱'},
+{q:'物质的量 n = ?',a:'n = m/M = N/NA = V/22.4(L/mol)'},
+{q:'什么是共价键？',a:'原子间共用电子对的化学键'},
+{q:'水的电离常数？',a:'Kw = [H⁺][OH⁻] = 1×10⁻¹⁴'},
+{q:'什么是同分异构体？',a:'分子式相同·结构不同的化合物'},
+{q:'酯化反应条件？',a:'酸+醇 → 酯+水, 浓H₂SO₄加热'},
+{q:'什么是催化剂？',a:'改变化学反应速率·本身不变'},
+{q:'化学平衡特征？',a:'正逆反应速率相等·各物浓度不变'},
+{q:'阿伏伽德罗常数？',a:'NA = 6.02×10²³'},
+{q:'酸的通性？',a:'与金属/碱/碱性氧化物/盐反应'},
+{q:'什么是电解质？',a:'在水溶液或熔融态能导电的化合物'},
+{q:'燃烧反应要素？',a:'可燃物+助燃物+着火点'},
+],
+english:[{q:'3500词怎么背？',a:'高频词先背·词根词缀·艾宾浩斯复习'},
+{q:'that/which区别？',a:'that可指人指物·which只指物'},
+{q:'虚拟语气现在时？',a:'If I were..., I would...'},
+{q:'定语从句关系代词？',a:'who主/宾·whom宾·which物·that通'},
+{q:'被动语态结构？',a:'be + 过去分词'},
+{q:'现在完成时？',a:'have/has + 过去分词·表示已完成'},
+{q:'比较级句型？',a:'more...than / as...as'},
+{q:'倒装句条件？',a:'否定词放句首·only放句首'},
+{q:'非谓语动词三种？',a:'todo(目的) · doing(主动) · done(被动)'},
+{q:'主谓一致原则？',a:'谓语与主语在人称数上一致'},
+{q:'it形式主语？',a:'It is + adj + to do sth'},
+{q:'what从句用法？',a:'what = the thing that'},
+{q:'情态动词can？',a:'表示能力·可能性·许可'},
+{q:'祈使句+祈使尾？',a:'...and/or + 将来时·固定搭配'},
+],
+chinese:[{q:'古诗鉴赏怎么答？',a:'意象→手法→情感·三步走'},
+{q:'议论文结构？',a:'引论→本论→结论·总分总'},
+{q:'骈文特点？',a:'对仗工整·四六句式'},
+{q:'文言句式之倒装？',a:'宾语前置·状语后置·主谓倒装'},
+{q:'实词怎么译？',a:'通假字·古今异义·一词多义·词类活用'},
+{q:'修辞手法有哪些？',a:'比喻·拟人·夸张·排比·对偶·反复'},
+{q:'意境是什么？',a:'作品中情感氛围·景中有情'},
+{q:'标题的作用？',a:'点明写作对象·设置悬念·贯穿线索'},
+{q:'引用的作用？',a:'增强说服力·丰富内容·增加文化内涵'},
+],
+history:[{q:'中国近代史起点？',a:'1840年鸦片战争'},
+{q:'辛亥革命时间？',a:'1911年·推翻清朝·建立民国'},
+{q:'五四运动时间？',a:'1919年·反帝反封建'},
+{q:'新中国成立时间？',a:'1949年10月1日'},
+{q:'改革开放时间？',a:'1978年·邓小平'},
+{q:'第一次工业革命标志？',a:'蒸汽机的发明'},
+{q:'第二次工业革命标志？',a:'电力和内燃机'},
+{q:'第三次工业革命标志？',a:'计算机和互联网'},
+{q:'一战时间？',a:'1914-1918'},
+{q:'二战时间？',a:'1939-1945'},
+],
+};
+
+const QZ = [
+{q:'二次函数 y=x²-4x+3 顶点坐标？',o:['(2,-1)','(2,1)','(-2,-1)','(4,3)'],a:0,s:'math',xp:15},
+{q:'F=ma中，质量不变时力和加速度成？',o:['正比','反比','平方正比','无关'],a:0,s:'physics',xp:10},
+{q:'pH=3比pH=5强多少倍？',o:['2倍','20倍','100倍','1000倍'],a:2,s:'chem',xp:15},
+{q:'If I ___ you, I would...',o:['am','was','were','be'],a:2,s:'english',xp:10},
+{q:'sin30° = ?',o:['1','1/2','√2/2','√3/2'],a:1,s:'math',xp:10},
+{q:'哪个不是可再生能源？',o:['太阳能','风能','煤炭','水能'],a:2,s:'physics',xp:10},
+{q:'"不以物喜"出自？',o:['论语','岳阳楼记','醉翁亭记','赤壁赋'],a:1,s:'chinese',xp:10},
+{q:'只能用that的是？',o:['指人','指物','有最高级','非限制性'],a:2,s:'english',xp:10},
+{q:'氧气化学式？',o:['O','O₂','O₃','H₂O'],a:1,s:'chem',xp:10},
+{q:'中国近代始于？',o:['1911','1919','1840','1949'],a:2,s:'history',xp:10},
+{q:'等差数列 aₙ=a₁+(n-1)d, a₁₀=?',o:['a₁+10d','a₁+9d','a₉+d','10a₁'],a:1,s:'math',xp:12},
+{q:'功的单位是？',o:['N','J','W','Pa'],a:1,s:'physics',xp:10},
+{q:'硫酸的化学式？',o:['HCl','HNO₃','H₂SO₄','H₂CO₃'],a:2,s:'chem',xp:10},
+{q:'关系代词who指？',o:['物','人','两者','地点'],a:1,s:'english',xp:10},
+{q:'"大庇天下寒士"出自？',o:['李白','杜甫','白居易','王维'],a:1,s:'chinese',xp:10},
+{q:'1919年事件？',o:['辛亥革命','五四运动','建立民国','中共成立'],a:1,s:'history',xp:10},
+{q:'三角函数tan30° = ?',o:['√3','√3/3','1/2','√2/2'],a:1,s:'math',xp:10},
+{q:'电功率公式？',o:['P=VI','P=IR','P=I²R','A和C'],a:3,s:'physics',xp:10},
+{q:'水的化学式？',o:['H₂O₂','H₂O','HO','OH'],a:1,s:'chem',xp:10},
+{q:'被动语态结构？',o:['have+done','be+doing','be+done','have+been'],a:2,s:'english',xp:10},
+];
+
+// ===== State =====
+let S = JSON.parse(localStorage.getItem('ks-state')||'{}');
+function initS(){
+if(!S.xp){S={xp:0,streak:0,lastDate:'',tc:0,tq:0,cl:0,lq:0,subj:{},taskFlag:0,taskDate:'',quizIdx:0,shuffledQuiz:[]}}
+}
+initS();
+const T = new Date().toISOString().slice(0,10);
+
+// ===== XP + Level =====
+function getLv(xp){if(xp>=2000)return{lv:10,t:'🏆 学神降临'};if(xp>=1000)return{lv:8,t:'👑 知识达人'};if(xp>=500)return{lv:5,t:'💎 融会贯通'};if(xp>=250)return{lv:3,t:'⚡ 小有所成'};if(xp>=100)return{lv:2,t:'📖 初窥门径'};return{lv:1,t:'🌱 新手学徒'}}
+function lvNext(xp){if(xp>=2000)return 9999;if(xp>=1000)return 2000;if(xp>=500)return 1000;if(xp>=250)return 500;if(xp>=100)return 250;return 100}
+function lvPrev(xp){if(xp>=2000)return 1000;if(xp>=1000)return 500;if(xp>=500)return 250;if(xp>=250)return 100;if(xp>=100)return 0;return 0}
+function addXP(n){
+const oldLv = getLv(S.xp); const oldPct = (S.xp-lvPrev(S.xp))/(lvNext(S.xp)-lvPrev(S.xp));
+S.xp += n; save();
+if(getLv(S.xp).lv > oldLv.lv) showLevelUp();
+renderAll();
+}
+function showLevelUp(){
+const l = getLv(S.xp);
+document.body.insertAdjacentHTML('beforeend',`<div class="level-up" onclick="this.remove()"><div class="level-up-inner"><div>🎉</div><h2>升级了！</h2><p style="font-size:22px;margin:8px 0">${l.t}</p><p style="font-size:12px">Lv.${l.lv}  · 继续加油</p></div></div>`);
+}
+
+// ===== Tasks =====
+function getTasks(){
+return [
+{id:'cards',n:'翻 5 张卡片',xp:20,check:()=>S.cl>=5},
+{id:'quiz',n:'答对 3 道题',xp:30,check:()=>S.tc>=3},
+{id:'subj',n:'学 2 门不同科',xp:15,check:()=>Object.keys(S.subj||{}).length>=2},
+];
+}
+function resetTasks(){
+S.tc=0; S.cl=0; S.subj={}; S.taskFlag=0; S.taskDate=T; save()
+}
+function checkTasks(){
+if(S.taskDate!==T){resetTasks()}
+const ts=getTasks(); let done=0;
+ts.forEach(t=>{if(t.check())done++});
+S.taskFlag=done;
+document.getElementById('task-prog').textContent=`已完成 ${done}/${ts.length} 项`;
+const el=document.getElementById('tasks'); el.innerHTML=ts.map(t=>`
+<div class="tt ${t.check()?'done':''}" onclick="${t.check()?'':`addXP(${t.xp});this.classList.add('done')`}">
+<div class="cb"></div><span class="tn">${t.n}</span><span class="tx">+${t.xp}XP</span></div>`).join('');
+if(done===ts.length)el.innerHTML+=`<div class="btn-row"><button class="btn btn-g" onclick="addXP(50)">🎁 全部完成 +50 XP</button></div>`;
+}
+
+// ===== Subjects Progress =====
+function getSubjProgress(subj){
+const d = S.subj[subj]||{c:0,q:0,t:0};
+return {cards:d.c,correct:d.q,total:d.t};
+}
+
+// ===== Render =====
+function renderAll(){
+initS();
+const l = getLv(S.xp); const prev=lvPrev(S.xp); const next=lvNext(S.xp);
+const pct = Math.min((S.xp-prev)/(next-prev)*100,100);
+document.getElementById('xp').textContent=S.xp;
+document.getElementById('streak').textContent='🔥'+S.streak;
+document.getElementById('level').textContent='Lv'+l.lv;
+document.getElementById('xp-fill').style.width=pct+'%';
+document.getElementById('xp-detail').textContent=`${S.xp-prev} / ${next-prev} XP · ${l.t}`;
+
+const hour = new Date().getHours();
+const gs=[{h:6,m:'🌅 早起学习，今天状态拉满！'},{h:9,m:'☀️ 晨间学习效率最高！'},{h:12,m:'🍱 午休来一题！'},{h:14,m:'💪 下午继续冲！'},{h:18,m:'🌇 傍晚充电'},{h:21,m:'🌙 睡前再学一点'},{h:0,m:'🦉 深夜学习很酷'}];
+for(const g of gs.reverse()){if(hour>=g.h){document.getElementById('greeting').textContent=g.m;break}}
+
+if(S.streak>=7)document.getElementById('hero-desc').textContent='🔥 连续'+S.streak+'天！';
+else if(S.streak>=3)document.getElementById('hero-desc').textContent='⚡ 连续'+S.streak+'天！';
+else document.getElementById('hero-desc').textContent='每天学一点，你就是学霸';
+
+checkTasks();
+renderSubjects();
+renderReport();
+renderQuiz(false);
+}
+
+function renderSubjects(){
+const el=document.getElementById('subj-grid');
+el.innerHTML=SUBJECTS.map(s=>{
+const p=getSubjProgress(s); return`<div class="g-card" onclick="showFC('${s}')"><div class="i">${SUBJ_ICONS[s]}</div><div class="n">${SUBJ_NAMES[s]}</div><div class="c">${FC[s]?.length||0}卡</div></div>`
+}).join('');
+const pe=document.getElementById('subj-progress'); pe.innerHTML=SUBJECTS.map(s=>{
+const p=getSubjProgress(s); const pct=Math.min(p.cards/(FC[s]?.length||1)*100,100);
+return`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px"><span>${SUBJ_ICONS[s]} ${SUBJ_NAMES[s]}</span><div style="flex:1;margin:0 12px"><div style="background:var(--surface);border-radius:10px;height:6px;overflow:hidden"><div style="width:${pct}%;background:${SUBJ_COLORS[s]};height:100%;border-radius:10px"></div></div></div><span style="color:var(--gold)">${p.cards}卡</span></div>`
+}).join('');
+}
+
+function renderReport(){
+document.getElementById('r-xp').textContent=S.xp;
+document.getElementById('r-streak').textContent=S.streak;
+document.getElementById('r-acc').textContent=S.tq>0?Math.round(S.tc/S.tq*100)+'%':'0%';
+document.getElementById('r-cards').textContent=S.cl||0;
+const bs=[{n:'初来乍到',i:'🌟',c:S.xp>0},{n:'3天打卡',i:'🔥',c:S.streak>=3},{n:'7天打卡',i:'💪',c:S.streak>=7},{n:'卡牌新手',i:'🃏',c:(S.cl||0)>=10},{n:'初战告捷',i:'🎯',c:S.tq>=5},{n:'百发百中',i:'💯',c:S.tq>=5&&S.tc===S.tq},{n:'全能选手',i:'🏅',c:Object.keys(S.subj||{}).length>=6}];
+document.getElementById('badges').innerHTML=bs.map(b=>`<span class="badge ${b.c?'badge-e':'badge-l'}">${b.i} ${b.n}</span>`).join('');
+const re=document.getElementById('r-subj');
+re.innerHTML=SUBJECTS.map(s=>{const p=getSubjProgress(s);const acc=p.total>0?Math.round(p.correct/p.total*100):0;return`<div class="rg"><span class="rn">${SUBJ_ICONS[s]} ${SUBJ_NAMES[s]}</span><span class="rv">${acc}% (${p.correct}/${p.total})</span></div>`}).join('');
+}
+
+// ===== Flashcards =====
+let fcSubj = 'math'; let fcIdx = 0;
+function showFC(subj){fcSubj=subj;fcIdx=0;document.getElementById('v-flashcards').style.display='block';switchView(2);renderFC();}
+function renderFC(){
+const cards = FC[fcSubj]||[];
+if(cards.length===0){document.getElementById('fc-q').textContent='暂无卡片';return}
+const card = cards[fcIdx]; const total = cards.length;
+document.getElementById('fc-subject-name').textContent=SUBJ_NAMES[fcSubj];
+document.getElementById('fc-progress').textContent=`${fcIdx+1}/${total}`;
+document.getElementById('fc-q').textContent=card.q;
+document.getElementById('fc-a').innerHTML=card.a;
+document.querySelector('.fc').classList.remove('flipped');
+if(!S.cl)S.cl=0;
+}
+function flipCard(){document.querySelector('.fc').classList.toggle('flipped');
+S.cl++;save();renderAll();}
+function prevCard(){const cards=FC[fcSubj]||[];fcIdx=(fcIdx-1+cards.length)%cards.length;renderFC();}
+function nextCard(){const cards=FC[fcSubj]||[];fcIdx=(fcIdx+1)%cards.length;S.xp++;save();renderAll();renderFC();}
+
+// ===== Quiz =====
+function renderQuiz(render=true){
+if(S.shuffledQuiz.length===0||S.shuffledQuiz.length!==QZ.length){
+S.shuffledQuiz=[...Array(QZ.length).keys()];for(let i=S.shuffledQuiz.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[S.shuffledQuiz[i],S.shuffledQuiz[j]]=[S.shuffledQuiz[j],S.shuffledQuiz[i]]}
+save()
+}
+if(S.quizIdx>=S.shuffledQuiz.length)S.quizIdx=0;
+const q = QZ[S.shuffledQuiz[S.quizIdx]];
+document.getElementById('qz-q').textContent='🎯 '+q.q;
+const el = document.getElementById('qz-o');
+el.innerHTML = q.o.map((o,i)=>`<button class="qz-o" onclick="answerQ(${i})">${'ABCD'[i]}. ${o}</button>`).join('');
+document.getElementById('qz-r').innerHTML='';
+document.getElementById('qz-action').style.display='none';
+if(!render)return;
+// Ensure view is shown
+}
+let qa = false;
+function answerQ(idx){
+if(qa) return; qa=true;
+const q = QZ[S.shuffledQuiz[S.quizIdx]];
+const cr = idx===q.a;
+S.tq++; if(cr) S.tc++;
+const opts = document.querySelectorAll('.qz-o');
+opts[q.a].classList.add('cr');
+if(!cr) opts[idx].classList.add('wr');
+const xp = cr?q.xp:3;
+addXP(xp);
+const subj = q.s; if(!S.subj[subj])S.subj[subj]={c:0,q:0,t:0};
+S.subj[subj].t++; if(cr)S.subj[subj].c++;
+S.cl = Math.min(S.cl+1, 999);
+save();
+document.getElementById('qz-r').innerHTML=cr
+?`✅ 正确！<div class="qz-xp">+${xp} XP</div>`
+:`❌ 正确答案 ${'ABCD'[q.a]}. ${q.o[q.a]}<div class="qz-xp">+${xp} XP</div>`;
+document.getElementById('qz-action').style.display='flex';
+}
+function nextQuiz(){S.quizIdx++;qa=false;renderQuiz(true);renderAll();}
+
+// ===== Tabs =====
+function switchView(idx){
+document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tabs .tab')[idx].classList.add('active');
+const vs=['v-home','v-subjects','v-flashcards','v-quiz','v-report'];
+vs.forEach(v=>{document.getElementById(v).style.display='none'});
+document.getElementById(vs[idx]).style.display='block';
+}
+document.querySelectorAll('.tab').forEach((t,i)=>t.addEventListener('click',()=>{switchView(i);if(i===3){renderQuiz(true)}}));
+
+// ===== Streak =====
+const yd = new Date(Date.now()-86400000).toISOString().slice(0,10);
+if(S.lastDate!==T){S.streak=S.lastDate===yd?S.streak+1:1;S.lastDate=T;addXP(5);save()}
+
+// Init
+function save(){localStorage.setItem('ks-state',JSON.stringify(S))}
+renderAll();
+renderFC();
+
+// Recent activity placeholder
+document.getElementById('recent-activity').innerHTML=S.cl>0?`✅ 共学习了 ${S.cl} 张卡片，答了 ${S.tq} 道题`:'还没有学习记录，快去翻卡吧！';
+</script>
+</body>
+</html>
