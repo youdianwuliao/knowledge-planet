@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎓 知识星球 — 学习是一件很酷的事</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a1a;--card:#14142b;--accent:#6c5ce7;--gold:#ffd700;--green:#00d4aa;--pink:#ff6b9d;--blue:#4ecdc4;--text:#e0e0ff;--sub:#8888aa}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 50%,var(--accent)33 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,var(--pink)22 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,var(--blue)22 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:100;background:var(--card);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-stats{display:flex;gap:20px;align-items:center}
+.stat{text-align:center}
+.stat-val{font-size:18px;font-weight:700;color:var(--gold)}
+.stat-label{font-size:11px;color:var(--sub)}
+
+/* Main */
+main{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:20px}
+
+/* Hero */
+.hero{text-align:center;padding:40px 0 30px}
+.hero h1{font-size:36px;font-weight:800;margin-bottom:8px}
+.hero h1 span{background:linear-gradient(135deg,var(--gold),var(--pink),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--sub);font-size:16px}
+.xp-bar{background:var(--card);border-radius:20px;height:12px;margin:20px auto 8px;max-width:400px;overflow:hidden;position:relative}
+.xp-fill{background:linear-gradient(90deg,var(--accent),var(--pink));height:100%;border-radius:20px;transition:width .5s}
+.xp-text{font-size:12px;color:var(--sub)}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:0 0 16px}
+.tab{padding:10px 20px;border-radius:25px;border:1px solid rgba(255,255,255,.1);background:var(--card);color:var(--sub);cursor:pointer;white-space:nowrap;transition:all .3s;font-size:14px}
+.tab.active,.tab:hover{border-color:var(--accent);color:#fff;background:var(--accent)33}
+
+/* Cards */
+.subjects{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:0 0 20px}
+.subject-card{background:var(--card);border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:all .3s;border:1px solid transparent;position:relative;overflow:hidden}
+.subject-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 30px rgba(108,92,231,.2)}
+.subject-card::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,var(--accent)11 0%,transparent 60%);opacity:0;transition:opacity .3s}
+.subject-card:hover::after{opacity:.05}
+.s-icon{font-size:36px;margin-bottom:8px}
+.s-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.s-count{font-size:12px;color:var(--sub)}
+
+/* Flashcards */
+.flashcard{perspective:1000px;height:280px;margin:20px 0;cursor:pointer}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
+.flashcard-front,.flashcard-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:20px;padding:30px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.flashcard-front{background:var(--card);border:2px solid var(--accent)44}
+.flashcard-back{background:var(--card);border:2px solid var(--green)44;transform:rotateY(180deg);overflow-y:auto}
+.flashcard-front .q-label{font-size:12px;color:var(--accent);margin-bottom:12px}
+.flashcard-front .q-text{font-size:20px;font-weight:600;line-height:1.6}
+.flashcard-back .a-text{font-size:16px;line-height:1.8;text-align:left;max-height:200px;overflow-y:auto}
+.flashcard-hint{text-align:center;color:var(--sub);font-size:13px;margin-top:8px}
+
+/* Buttons */
+.btn-row{display:flex;gap:10px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.btn{padding:12px 28px;border-radius:25px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all .3s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#7c6ff7;transform:scale(1.03)}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.1)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#ffaa00);color:#1a1a2e}
+.btn-gold:hover{transform:scale(1.03)}
+.btn-correct{background:var(--green);color:#fff}
+.btn-wrong{background:var(--pink);color:#fff}
+
+/* Quiz */
+.quiz{background:var(--card);border-radius:20px;padding:24px;margin:16px 0}
+.quiz-q{font-size:18px;font-weight:600;margin-bottom:16px;line-height:1.6}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:var(--bg);color:var(--text);text-align:left;font-size:15px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{border-color:var(--accent);background:var(--accent)22}
+.quiz-option.correct{border-color:var(--green);background:var(--green)22;color:var(--green)}
+.quiz-option.wrong{border-color:var(--pink);background:var(--pink)22;color:var(--pink)}
+.quiz-result{text-align:center;padding:20px;font-size:18px;font-weight:700;margin-top:8px}
+.quiz-xp{font-size:24px;color:var(--gold);margin-top:4px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:0 0 20px}
+.stat-card{background:var(--card);border-radius:16px;padding:20px;text-align:center}
+.stat-card .val{font-size:32px;font-weight:800;color:var(--gold);margin:8px 0}
+.stat-card .lbl{font-size:13px;color:var(--sub)}
+
+/* Achievements */
+.badge-row{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0}
+.badge{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.badge-earned{background:var(--gold)22;color:var(--gold);border:1px solid var(--gold)44}
+.badge-locked{background:var(--card);color:var(--sub);border:1px solid rgba(255,255,255,.1);opacity:.5}
+
+/* Responsive */
+@media(max-width:600px){
+.hero h1{font-size:24px}
+.subjects{grid-template-columns:repeat(2,1fr)}
+.flashcard{height:240px}
+.flashcard-front .q-text{font-size:17px}
+.nav-stats{gap:12px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">🎓 知识星球</div>
+<div class="nav-stats">
+<div class="stat"><div class="stat-val" id="xp">0</div><div class="stat-label">经验值</div></div>
+<div class="stat"><div class="stat-val" id="streak">🔥 0</div><div class="stat-label">连续打卡</div></div>
+<div class="stat"><div class="stat-val" id="level">Lv.1</div><div class="stat-label">等级</div></div>
+</div>
+</nav>
+
+<main>
+<!-- Hero -->
+<div class="hero">
+<h1><span id="greeting">准备好变强了吗？</span></h1>
+<p id="hero-desc">每天学一点，你就是下一个学霸 ⚡</p>
+<div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+<div class="xp-text" id="xp-detail">0 / 100 XP · Lv.1 新手学徒</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+<div class="tab active" data-view="subjects">📚 学科</div>
+<div class="tab" data-view="flashcards">🃏 速记卡</div>
+<div class="tab" data-view="quiz">🎯 闯关答题</div>
+<div class="tab" data-view="stats">🏆 成就</div>
+</div>
+
+<!-- Subjects -->
+<div id="subjects" class="subjects"></div>
+
+<!-- Flashcards -->
+<div id="flashcards" style="display:none">
+<div class="flashcard" onclick="flipCard()">
+<div class="flashcard-inner">
+<div class="flashcard-front">
+<div class="q-label">💡 知识点 · 点击翻转</div>
+<div class="q-text" id="fc-question"></div>
+</div>
+<div class="flashcard-back">
+<div class="a-text" id="fc-answer"></div>
+</div>
+</div>
+</div>
+<div class="flashcard-hint">👆 点击卡片翻转查看答案</div>
+<div class="btn-row">
+<button class="btn btn-secondary" onclick="prevCard()">⬅ 上一张</button>
+<button class="btn btn-primary" onclick="nextCard()">下一张 ➡</button>
+</div>
+</div>
+
+<!-- Quiz -->
+<div id="quiz" style="display:none">
+<div class="quiz">
+<div class="quiz-q" id="quiz-question"></div>
+<div id="quiz-options"></div>
+<div class="quiz-result" id="quiz-result"></div>
+<div class="btn-row" id="quiz-action" style="display:none">
+<button class="btn btn-primary" onclick="nextQuiz()">下一题 ➡</button>
+</div>
+</div>
+</div>
+
+<!-- Stats -->
+<div id="stats" style="display:none">
+<div class="stats-grid">
+<div class="stat-card"><div class="lbl">总经验</div><div class="val" id="s-xp">0</div><div class="lbl">XP</div></div>
+<div class="stat-card"><div class="lbl">连续打卡</div><div class="val" id="s-streak">0</div><div class="lbl">天</div></div>
+<div class="stat-card"><div class="lbl">正确率</div><div class="val" id="s-acc">0%</div><div class="lbl">答题</div></div>
+<div class="stat-card"><div class="lbl">已学卡片</div><div class="val" id="s-cards">0</div><div class="lbl">张</div></div>
+</div>
+<h3 style="margin:16px 0 8px;color:var(--text)">🏅 成就徽章</h3>
+<div class="badge-row" id="badges"></div>
+</div>
+</main>
+
+<script>
+// ===== Data =====
+const subjects = [
+{id:'math',icon:'📐',name:'数学',count:'32 卡',color:'#6c5ce7'},
+{id:'physics',icon:'⚡',name:'物理',count:'24 卡',color:'#4ecdc4'},
+{id:'chem',icon:'🧪',name:'化学',count:'28 卡',color:'#ff6b9d'},
+{id:'english',icon:'📖',name:'英语',count:'40 卡',color:'#ffd700'},
+{id:'chinese',icon:'🖋️',name:'语文',count:'20 卡',color:'#a29bfe'},
+{id:'history',icon:'🏛️',name:'历史',count:'18 卡',color:'#fd79a8'},
+];
+
+const flashcards = {
+math:[
+{q:'二次函数 y=ax²+bx+c 的顶点坐标公式是？',a:'顶点坐标 (-b/2a, 4ac-b²/4a)<br>对称轴 x=-b/2a<br><br>🎯 记忆技巧：对称轴在正中间，顶点是最值点'},
+{q:'正弦定理的公式是什么？',a:'a/sinA = b/sinB = c/sinC = 2R<br>（R为外接圆半径）<br><br>💡 用途：已知两边一角→求第三边；已知两角一边→求另一边'},
+{q:'等差数列求和公式？',a:'Sₙ = n(a₁+aₙ)/2 = na₁ + n(n-1)d/2<br><br>🪶 口诀：首项加末项，乘项数除二'},
+{q:'圆锥的体积公式？',a:'V = πr²h/3<br><br>💡 对比：圆柱 πr²h，圆锥是1/3<br>记住「柱三锥一」'},
+{q:'什么是充要条件？','A⇒B，A是B的充分条件；B⇒A，A是B的必要条件<br>两者同时成立→充要条件<br><br>🎯 口诀：小推大，充分；大推小，必要'},
+],
+physics:[
+{q:'牛顿第二定律公式？','F = ma<br>力 = 质量 × 加速度<br><br>⚡ 单位：F(N), m(kg), a(m/s²)<br>注意方向和矢量合成'},
+{q:'动能定理的内容？','W = ΔEₖ = ½mv₂² - ½mv₁²<br>合外力做的功 = 动能变化量<br><br>💡 适用范围：恒力、变力、直线、曲线 都行！'},
+{q:'欧姆定律的三个变形？','I = U/R（电流）<br>U = IR（电压）<br>R = U/I（电阻）<br><br>🪶 口诀：欧姆老爷，电压在上'},
+{q:'什么是自由落体？','初速度为0，仅受重力作用的运动<br>v = gt<br>h = ½gt²<br><br>⚡ 地球上 g≈9.8m/s²，做题常用10'},
+],
+chem:[
+{q:'化学元素周期表前20号怎么记？','氢氦锂铍硼，碳氮氧氟氖<br>钠镁铝硅磷，硫氯氩钾钙<br><br>🪶 谐音梗：亲爱李皮朋，探蛋养福奶'},
+{q:'什么是氧化还原反应？','有电子转移的反应<br>升失氧（化合价升高、失电子、被氧化）<br>降得还（化合价降低、得电子、被还原）<br><br>💡 口诀：升失氧、降得还'},
+{q:'pH 值和酸碱性的关系？','pH < 7 酸性（越小越酸）<br>pH = 7 中性（纯水）<br>pH > 7 碱性（越大越碱）<br><br>🧪 pH = -lg[H⁺]，差1就是差10倍'},
+],
+english:[
+{q:'高中英语 3500 词怎么高效背？','1. 按频率背：先高频词（1000词覆盖80%）<br>2. 词根词缀法：un-否定, re-重复, -tion名词<br>3. 语境记忆：读文章记单词<br>4. 艾宾浩斯复习：1天/3天/7天/30天<br><br>💡 每天30个，4个月搞定'},
+{q:'定语从句 that 和 which 的区别？','that：人+物都行，限制性<br>which：只指物，限制+非限制<br><br>🎯 只用that的情况：<br>• 先行词有最高级/序数词<br>• 先行词是all/anything/nothing<br>• 先行词有人又有物'},
+{q:'虚拟语气的三种时态？','与现在相反：If I were you, I would go.<br>与过去相反：If I had known, I would have come.<br>与将来相反：If it should rain, I would stay.<br><br>💡 口诀：现在were，过去had done，将来should'},
+],
+chinese:[
+{q:'古诗鉴赏的答题模板？','1. 意象分析：写了什么景物→什么特点<br>2. 手法分析：比喻/拟人/对比/用典<br>3. 情感分析：表达了什么情感<br><br>🖋️ 模板：诗中通过___意象，运用___手法，表达了___之情'},
+{q:'议论文怎么写能高分？','1. 开头：引用名言/现象切入（2行）<br>2. 论点：明确观点（1句）<br>3. 论据：事实+数据+名人例子<br>4. 论证：正反对比/层层递进<br>5. 结尾：升华主题<br><br>💡 结构：引-议-联-结'},
+],
+history:[
+{q:'中国近代史的几个关键节点？','1840 鸦片战争<br>1911 辛亥革命<br>1919 五四运动<br>1921 中共成立<br>1949 新中国成立<br>1978 改革开放<br><br>🏛️ 谐音记：要发四零，依旧依旧，依旧而已'},
+{q:'世界史三次工业革命？','第一次（18C）：蒸汽机、纺织机<br>第二次（19C）：电力、内燃机<br>第三次（20C）：计算机、互联网<br><br>⚡ 关键词：蒸→电→信'},
+],
+};
+
+const quizzes = [
+{q:'二次函数 y=x²-4x+3 的顶点坐标是？',options:['(2, -1)','(2, 1)','(-2, -1)','(4, 3)'],ans:0,subj:'math',xp:15},
+{q:'F=ma 中，当质量不变时，力和加速度成什么比？',options:['正比','反比','平方正比','无关'],ans:0,subj:'physics',xp:10},
+{q:'pH=3 的溶液比 pH=5 的溶液酸性强多少倍？',options:['2倍','20倍','100倍','1000倍'],ans:2,subj:'chem',xp:15},
+{q:'"If I ___ you, I would study harder." 填什么？',options:['am','was','were','be'],ans:2,subj:'english',xp:10},
+{q:'氧气的化学式是？',options:['O','O₂','O₃','H₂O'],ans:1,subj:'chem',xp:10},
+{q:'中国近代史始于哪一年？',options:['1911','1919','1840','1949'],ans:2,subj:'history',xp:10},
+{q:'sin30° 等于？',options:['1','1/2','√2/2','√3/2'],ans:1,subj:'math',xp:10},
+{q:'哪个不是可再生能源？',options:['太阳能','风能','煤炭','水能'],ans:2,subj:'physics',xp:10},
+{q:'"不以物喜，不以己悲"出自？',options:['论语','岳阳楼记','醉翁亭记','赤壁赋'],ans:1,subj:'chinese',xp:10},
+{q:'定语从句中只能用 that 的是？',options:['指人','指物','先行词有最高级','非限制性'],ans:2,subj:'english',xp:10},
+];
+
+// ===== State =====
+let state = JSON.parse(localStorage.getItem('study-state')||'{"xp":0,"streak":0,"lastDate":"","totalCorrect":0,"totalQ":0,"cardsLearned":0,"quizIdx":0}');
+let currentSubject = 'math';
+let currentCardIdx = 0;
+let currentQuizIdx = 0;
+let quizAnswered = false;
+
+function save(){localStorage.setItem('study-state',JSON.stringify(state))}
+
+// ===== Greeting =====
+const hour = new Date().getHours();
+const greetings = [
+{h:6,m:'🌅 早起学习，元气满满！'},
+{h:8,m:'☀️ 早上好！今天比昨天更厉害'},
+{h:12,m:'🍱 午休时间，来张速记卡？'},
+{h:14,m:'💪 下午黄金学习时段！'},
+{h:18,m:'🌇 傍晚充电时间'},
+{h:21,m:'🌙 睡前再学一点，梦里都会'},
+{h:0,m:'🦉 深夜学习者，你是最酷的'},
+];
+for(const g of greetings.reverse()){if(hour>=g.h){document.getElementById('greeting').textContent=g.m;break}}
+
+// ===== Renders =====
+function renderAll(){
+document.getElementById('xp').textContent = state.xp;
+document.getElementById('streak').textContent = '🔥 '+state.streak;
+const lv = Math.floor(state.xp/100)+1;
+document.getElementById('level').textContent = 'Lv.'+lv;
+const xpInLv = state.xp%100;
+document.getElementById('xp-fill').style.width = xpInLv+'%';
+document.getElementById('xp-detail').textContent = xpInLv+' / 100 XP · Lv.'+lv+' '+(lv<3?'新手学徒':lv<6?'进阶学者':lv<10?'知识达人':'学神降临');
+renderSubjects();
+renderFlashcard();
+renderStats();
+}
+
+function renderSubjects(){
+const el = document.getElementById('subjects');
+el.innerHTML = subjects.map(s=>`
+<div class="subject-card" onclick="selectSubject('${s.id}')" style="--accent:${s.color}">
+<div class="s-icon">${s.icon}</div>
+<div class="s-name">${s.name}</div>
+<div class="s-count">${s.count}</div>
+</div>`).join('');
+}
+
+function selectSubject(id){
+currentSubject = id;
+currentCardIdx = 0;
+showView('flashcards');
+renderFlashcard();
+}
+
+function renderFlashcard(){
+const cards = flashcards[currentSubject]||[];
+if(cards.length===0){document.getElementById('fc-question').textContent='暂无卡片';return}
+const card = cards[currentCardIdx];
+document.getElementById('fc-question').textContent = card.q;
+document.getElementById('fc-answer').innerHTML = card.a;
+document.querySelector('.flashcard').classList.remove('flipped');
+if(!state.cardsLearned)state.cardsLearned=0;
+if(!state._seen)state._seen={};
+state._seen[currentSubject+'-'+currentCardIdx] = 1;
+}
+
+function flipCard(){
+document.querySelector('.flashcard').classList.toggle('flipped');
+state.cardsLearned++;
+state.xp += 2;
+save();renderAll();
+}
+
+function prevCard(){
+const cards = flashcards[currentSubject]||[];
+currentCardIdx = (currentCardIdx-1+cards.length)%cards.length;
+renderFlashcard();
+}
+function nextCard(){
+const cards = flashcards[currentSubject]||[];
+currentCardIdx = (currentCardIdx+1)%cards.length;
+state.xp += 1;
+save();renderAll();
+}
+
+// ===== Quiz =====
+function startQuiz(){
+currentQuizIdx = 0;
+quizAnswered = false;
+showView('quiz');
+renderQuiz();
+}
+
+function renderQuiz(){
+if(currentQuizIdx >= quizzes.length) currentQuizIdx = 0;
+const q = quizzes[currentQuizIdx];
+document.getElementById('quiz-question').textContent = '🎯 '+q.q;
+const opts = document.getElementById('quiz-options');
+opts.innerHTML = q.options.map((o,i)=>`
+<button class="quiz-option" onclick="answerQuiz(${i})">${'ABCD'[i]}. ${o}</button>
+`).join('');
+document.getElementById('quiz-result').innerHTML = '';
+document.getElementById('quiz-action').style.display = 'none';
+quizAnswered = false;
+}
+
+function answerQuiz(idx){
+if(quizAnswered) return;
+quizAnswered = true;
+const q = quizzes[currentQuizIdx];
+const correct = idx === q.ans;
+state.totalQ++;
+if(correct) state.totalCorrect++;
+const opts = document.querySelectorAll('.quiz-option');
+opts[q.ans].classList.add('correct');
+if(!correct) opts[idx].classList.add('wrong');
+const xpEarned = correct ? q.xp : 3;
+state.xp += xpEarned;
+document.getElementById('quiz-result').innerHTML = correct
+? `✅ 正确！太厉害了！<div class="quiz-xp">+${xpEarned} XP</div>`
+: `❌ 别灰心，正确答案是 ${'ABCD'[q.ans]}. ${q.options[q.ans]}<div class="quiz-xp">+${xpEarned} XP</div>`;
+document.getElementById('quiz-action').style.display = 'flex';
+save();renderAll();
+}
+
+function nextQuiz(){
+currentQuizIdx++;
+if(quizAnswered) quizAnswered = false;
+renderQuiz();
+}
+
+// ===== Stats =====
+function renderStats(){
+document.getElementById('s-xp').textContent = state.xp;
+document.getElementById('s-streak').textContent = state.streak;
+document.getElementById('s-acc').textContent = state.totalQ>0?Math.round(state.totalCorrect/state.totalQ*100)+'%':'0%';
+document.getElementById('s-cards').textContent = state.cardsLearned||0;
+
+const badges = [
+{name:'首次登录',icon:'🌟',cond:state.xp>0},
+{name:'50 XP',icon:'💎',cond:state.xp>=50},
+{name:'100 XP',icon:'👑',cond:state.xp>=100},
+{name:'500 XP',icon:'🏆',cond:state.xp>=500},
+{name:'卡牌大师',icon:'🃏',cond:(state.cardsLearned||0)>=10},
+{name:'答题高手',icon:'🎯',cond:state.totalQ>=5},
+{name:'全对之王',icon:'💯',cond:state.totalCorrect>=5&&state.totalQ===state.totalCorrect},
+];
+document.getElementById('badges').innerHTML = badges.map(b=>`
+<span class="badge ${b.cond?'badge-earned':'badge-locked'}">${b.icon} ${b.name}</span>
+`).join('');
+}
+
+// ===== View =====
+function showView(name){
+document.querySelectorAll('#subjects,#flashcards,#quiz,#stats').forEach(e=>e.style.display='none');
+document.getElementById(name).style.display = name==='flashcards'?'block':name==='quiz'?'block':name==='stats'?'block':'grid';
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+Array.from(document.querySelectorAll('.tab')).find(t=>t.dataset.view===name)?.classList.add('active');
+if(name==='quiz') startQuiz();
+if(name==='stats') renderStats();
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+
+// ===== Streak =====
+const today = new Date().toISOString().slice(0,10);
+if(state.lastDate !== today){
+const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+state.streak = state.lastDate===yesterday ? state.streak+1 : 1;
+state.lastDate = today;
+state.xp += 5;
+save();
+}
+
+// Init
+renderAll();
+document.getElementById('hero-desc').textContent = state.streak>=7?'🔥 连续 '+state.streak+' 天！你已经无敌了':state.streak>=3?'⚡ 连续 '+state.streak+' 天！继续加油':'每天学一点，你就是下一个学霸 ⚡';
+</script>
+</body>
+</html>
